@@ -73,8 +73,8 @@
 
                 const priceList = sprData.map(d => +d['Average Price (cents/kWh)']).filter(d => !isNaN(d))
                 const namesSpr = sprData.map(d => clear(d.Entity))
-                const min = Math.min(...priceList)
-                const max = Math.max(...priceList) > 49 ? 47 : Math.max(...priceList)
+                const min = "Coming Soon"
+                const max = "Yes"
                 const myColor = d3.scaleLinear().domain([min, max]).range(["#065ED4", "#0048A8"])
 
 
