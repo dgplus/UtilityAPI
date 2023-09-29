@@ -54,17 +54,23 @@
             Promise.all([
                 d3.csv(
                     "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_zsl_ENEGp078oZ2dU2wBZTsIccGvHaK75GIM_yNQ_jS421uQe3s-0vOy6ekJnCQPx-yMlI3W3Zdh/pub?gid=410626648&single=true&output=csv"
-                    ),
+                ),
             ]).then(data => {
                 console.log('data', data);
                 const [sprData] = data
 
                 mainData.sprData.push(...sprData)
 
-                const values = sprData.map(d => d['Utility Coverage'])
+                const labels = {
+                    "No": "No Color",
+                    "Yes": "#0048A8",
+                    "2024": "Coming Soon"
+                };
+
                 const colorScale = d3.scaleOrdinal()
-                    .domain(values)
-                    .range(['#0048A8', '#065ED4'])
+                    .domain(Object.keys(labels)) // Use the keys from the labels object
+                    .range(Object.values(labels)); // Use the values (colors) from the labels object
+
 
                 generateLegend(colorScale, legendDiv)
 
@@ -130,6 +136,11 @@
 
         function generateLegend(colorScale, legendDiv) {
             const values = colorScale.domain();
+            const labels = {
+                "No": "No Color",
+                "Yes": "#0048A8",
+                "2024": "Coming Soon"
+            };
 
             values.forEach(value => {
                 const div = document.createElement("div");
@@ -137,7 +148,7 @@
 
                 const text = document.createElement("div");
                 text.className = "square-text";
-                text.innerText = value;
+                text.innerText = labels[value];
 
                 const sq = document.createElement("div");
                 sq.className = "square";
