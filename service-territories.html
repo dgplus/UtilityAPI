@@ -62,7 +62,7 @@
         map.on('load', () => {
 
             Promise.all([
-                d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTpREYfOKz_1Q7BpOQzZRzgJVD16dBRkiCnd-Ri_1NU73mZ47_gsE37H96sD3lVAx0O5Tpywl-7NYAO/pub?gid=410626648&single=true&output=csv"),
+                d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vT_zsl_ENEGp078oZ2dU2wBZTsIccGvHaK75GIM_yNQ_jS421uQe3s-0vOy6ekJnCQPx-yMlI3W3Zdh/pub?gid=410626648&single=true&output=csv"),
             ]).then(data => {
                 console.log('data', data);
                 const [sprData, mapData] = data
@@ -71,7 +71,7 @@
 
                 mainData.sprData.push(...sprData)
 
-                const priceList = sprData.map(d => +d['Average Price (cents/kWh)']).filter(d => !isNaN(d))
+                // const priceList = sprData.map(d => +d['Average Price (cents/kWh)']).filter(d => !isNaN(d))
                 const namesSpr = sprData.map(d => clear(d.Entity))
                 const min = "Coming Soon"
                 const max = "Yes"
