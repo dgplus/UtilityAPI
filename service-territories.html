@@ -53,7 +53,7 @@
             Promise.all([
                 d3.csv(
                     "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_zsl_ENEGp078oZ2dU2wBZTsIccGvHaK75GIM_yNQ_jS421uQe3s-0vOy6ekJnCQPx-yMlI3W3Zdh/pub?gid=410626648&single=true&output=csv"
-                    ),
+                ),
             ]).then(data => {
                 const [sprData] = data;
                 mainData.sprData.push(...sprData);
@@ -189,4 +189,17 @@
         const fullscreen = document.getElementById('fullscreen');
         fullscreen.addEventListener('click', toggleFullscreen);
 
-        function toggleFullscreen()
+        function toggleFullscreen() {
+            let elem = document.getElementById("mapcontainer");
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().catch((err) => {
+                    alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    </script>
+</body>
+
+</html>
