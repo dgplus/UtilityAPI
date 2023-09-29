@@ -62,9 +62,9 @@
                 mainData.sprData.push(...sprData)
 
                 const labels = {
-                    "No": "No Color",
+                    "No": "#ccc",
                     "Yes": "#0048A8",
-                    "2024": "Coming Soon"
+                    "2024": "#065ED4"
                 };
 
                 const colorScale = d3.scaleOrdinal()
@@ -137,8 +137,8 @@
         function generateLegend(colorScale, legendDiv) {
             const values = colorScale.domain();
             const labels = {
-                "No": "No Color",
-                "Yes": "#0048A8",
+                "No": "No",
+                "Yes": "Yes",
                 "2024": "Coming Soon"
             };
 
