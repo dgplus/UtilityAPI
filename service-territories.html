@@ -75,11 +75,11 @@
                 generateLegend(colorScale, legendDiv)
 
                 map.setPaintProperty(layerName, "fill-color", [
-                    'match',
-                    ['get', 'Utility Coverage'],
+                    "match",
+                    ["get", "Utility Coverage"],
                     ["Yes"], "#0048A8",
                     ["2024"], "#065ED4",
-                    'transparent'
+                    "transparent"
                 ]);
                 map.setPaintProperty(layerName, "fill-opacity", 0.7);
                 map.setPaintProperty(layerName, "fill-outline-color", "white");
