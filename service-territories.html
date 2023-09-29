@@ -180,42 +180,42 @@
 
         });
 
-        function buildOwnershipFilters(data) {
+        // function buildOwnershipFilters(data) {
 
-            const uniqueNames = [...new Set(data.map(d => d.Ownership.toUpperCase()).filter(d => d !== ""))]
+        //     const uniqueNames = [...new Set(data.map(d => d.Ownership.toUpperCase()).filter(d => d !== ""))]
 
-            uniqueNames.forEach(d => {
+        //     uniqueNames.forEach(d => {
 
-                const div = document.createElement("div")
-                div.className = "checkbox-container"
-                const input = document.createElement("input")
-                input.type = "checkbox"
-                input.className = "checkbox"
-                input.id = d
-                if (d === "INVESTOR OWNED") {
-                    mainData.filters.add(d)
-                    input.checked = true
-                } else {
-                    input.checked = false
-                }
-                input.addEventListener('input', (e) => {
-                    console.log('input', input.checked);
-                    mainData.filters.has(d) ? mainData.filters.delete(d) : mainData.filters.add(d)
-                    map.setFilter(layerName, ["in", "TYPE", ...mainData.filters]);
-                })
+        //         const div = document.createElement("div")
+        //         div.className = "checkbox-container"
+        //         const input = document.createElement("input")
+        //         input.type = "checkbox"
+        //         input.className = "checkbox"
+        //         input.id = d
+        //         if (d === "INVESTOR OWNED") {
+        //             mainData.filters.add(d)
+        //             input.checked = true
+        //         } else {
+        //             input.checked = false
+        //         }
+        //         input.addEventListener('input', (e) => {
+        //             console.log('input', input.checked);
+        //             mainData.filters.has(d) ? mainData.filters.delete(d) : mainData.filters.add(d)
+        //             map.setFilter(layerName, ["in", "TYPE", ...mainData.filters]);
+        //         })
 
-                const label = document.createElement("label")
-                label.htmlFor = d
-                label.innerText = d
+        //         const label = document.createElement("label")
+        //         label.htmlFor = d
+        //         label.innerText = d
 
-                div.appendChild(input)
-                div.appendChild(label)
-                filtersDiv.appendChild(div)
-                // return div
-            })
+        //         div.appendChild(input)
+        //         div.appendChild(label)
+        //         filtersDiv.appendChild(div)
+        //         // return div
+        //     })
 
-            map.setFilter(layerName, ["in", "TYPE", ...mainData.filters]);
-        }
+        //     map.setFilter(layerName, ["in", "TYPE", ...mainData.filters]);
+        // }
 
         fullscreen.addEventListener('click', toggleFullscreen)
 
