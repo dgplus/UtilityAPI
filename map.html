@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Map: Retail Price of Electricity by Utility | DG+</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,300" rel="stylesheet" type="text/css">
+    <link href="css/map-styles.css" rel="stylesheet">
+
+</head>
+
+<style>
+    .legend-container {
+        display: flex;
+        flex-direction: column;
+
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .legend-square {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+</style>
+
+<body>
+
+    <div id="mapcontainer">
+        <div id="map"></div>
+        <div class="map-overlay top">
+            <div class="map-overlay-inner">
+                <h3>Title ?</h3>
+                <!-- <h4>cents/kWh</h4> -->
+                <div id="legend" class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-square" style="background-color: #0048A8"></div>
+                        <div class="legend-text">Yes</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-square" style="background-color: #065ED4"></div>
+                        <div class="legend-text">2024</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-square" style="background-color: #F8F8F8"></div>
+                        <div class="legend-text">No</div>
+                    </div>
+
+                </div>
+                <div id="filters"></div>
+                <label>Borders: <input id="borders" type="checkbox" checked></label>
+            </div>
+
+        </div>
+        <div id="fullscreen">Full screen</div>
+
+
+    </div>
+
+    <script>
+        const filtersDiv = document.getElementById('filters');
+        const legendDiv = document.getElementById('legend');
+        const bordersCheckbox = document.getElementById('borders');
+        const slider = document.getElementById('slider');
+        const sliderValue = document.getElementById('slider-value');
+        const layerName = 'electric-retail-service-territories'
+
+        const fullscreen = document.getElementById('fullscreen');
+        const mainData = {
+            sprData: [],
+            filters: new Set()
+        }
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZGdwbHVzZGVzaWduIiwiYSI6ImNsMGhndHJvdjA4aWozZW1xb21tY3VuZGoifQ.R8LGSPakcmmq-FVmRp7_1A';
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+            style: 'mapbox://styles/dgplusdesign/clndfduov03va01r7ayp5d9kl', // style URL
+            center: { lng: -99.48299257741193, lat: 40.92230044374887 },
+            zoom: 4.5,// starting zoom,
+            projection: "mercator"
+        });
+
+        map.on('load', () => {
+
+            Promise.all([
+                // d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTpREYfOKz_1Q7BpOQzZRzgJVD16dBRkiCnd-Ri_1NU73mZ47_gsE37H96sD3lVAx0O5Tpywl-7NYAO/pub?gid=410626648&single=true&output=csv"),
+                d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vT_zsl_ENEGp078oZ2dU2wBZTsIccGvHaK75GIM_yNQ_jS421uQe3s-0vOy6ekJnCQPx-yMlI3W3Zdh/pub?output=csv"),
+            ]).then(data => {
+                console.log('data', data);
+                const [sprData] = data
+                mainData.sprData = sprData;
+                const filtersArray = sprData
+                    .map(d => {
+                        const value = d['Utility Coverage'].toLowerCase().trim();
+                        let color = 'transparent';
+                        switch (value) {
+                            case 'yes':
+                                color = '#0048A8';
+                                break;
+                            case 'no':
+                                color = '#F8F8F8';
+                                break;
+                            case '2024':
+                                color = '#065ED4';
+                                break;
+                        }
+                        return [['==', ['get', "NAME"], d.Entity.toUpperCase()], color]
+                    })
+                console.log('filtersArray', filtersArray);
+
+                map.setPaintProperty(layerName, "fill-color", [
+                    'case',
+                    ...filtersArray.flat(),
+                    "transparent"
+                ])
+
+                map.setPaintProperty(layerName, "fill-opacity", 0.7)
+                map.setPaintProperty(layerName, "fill-outline-color", "white")
+                //map.setPaintProperty(layerName, "fill-outline-color", "transparent")
+
+                //set layers order 1st YES 
+                const YES = mainData.sprData
+                    .filter(d => d['Utility Coverage'].toLowerCase().trim() === 'yes')
+                    .map(d => d.Entity.toUpperCase())
+                    .map(d => [["==", ["get", "NAME"], d], 100000])
+
+                map.setLayoutProperty(layerName, "fill-sort-key", [
+                    "case",
+                    ...YES.flat(),
+                    0  // Default sort key value for "no"
+                ])
+
+            })
+
+            //A, D, E, J, P, and Q
+
+            const displayItemsNames = [
+                'Entity',
+                'Ownership',
+                'Customers (Count)',
+                'Utility Coverage',
+                'Interval Data',
+                'Meter Interval'
+            ]
+
+            map.on("click", layerName, e => {
+                console.log('e', e);
+                const features = map.queryRenderedFeatures(e.point);
+                console.log('features', features);
+                const names = features.map((feat) => {
+                    console.log('feat.properties.TYPE===>', feat.properties.TYPE);
+                    return feat.properties.NAME;
+                });
+                const uniqueNames = [...new Set(names)]
+                console.log('uniqueNames', uniqueNames);
+
+
+                const descr = uniqueNames
+                    .filter(name => name)
+                    .map(name => {
+
+                        const res = mainData.sprData
+                            .filter(spr => spr.Entity && spr.Entity !== "")
+                            .find(spr => clear(spr.Entity) === clear(name))
+
+                        const text = res ? `
+                        <div class="popup-main">
+                            <div><b>${res['Entity']}</b></div>
+                            <div>Ownership: ${res['Ownership']}</div>
+                            <div>Customers (Count): ${res['Customers (Count)']}</div>
+                            <div>Utility Coverage: ${res['Utility Coverage']}</div>
+                            <div>Interval Data: ${res['Interval Data']}</div>
+                            <div>Meter Interval: ${res['Meter Interval']}</div>
+                        </div>
+                            `
+                            : ``
+                        //     `
+                        // <div class="popup-main">
+                        //     <div><b>${name}</b></div>
+                        //     <div>NO DATA</div>
+                        // </div>
+                        // `
+
+                        return text
+                    }).join("")
+
+                // Copy coordinates array.
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(descr)
+                    .addTo(map);
+
+
+            })
+            map.on('mouseenter', layerName, () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves.
+            map.on('mouseleave', layerName, () => {
+                map.getCanvas().style.cursor = '';
+            });
+
+            bordersCheckbox.addEventListener('input', (e) => {
+                const val = bordersCheckbox.checked ? "white" : "transparent"
+                map.setPaintProperty(layerName, "fill-outline-color", val)
+            })
+
+        });
+
+        fullscreen.addEventListener('click', toggleFullscreen)
+        function toggleFullscreen() {
+            let elem = document.getElementById("mapcontainer");
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().catch((err) => {
+                    alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function clear(str) {
+            // console.log('str', str);
+            if (!str) return "";
+            return str.replaceAll(/[\,\.]/g, " ").replace(/[\s]{2,}/, " ").trim().toLowerCase()
+        }
+
+    </script>
+
+</body>
+
+</html>
