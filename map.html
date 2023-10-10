@@ -13,53 +13,76 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,300" rel="stylesheet" type="text/css">
     <link href="css/map-styles.css" rel="stylesheet">
 
+    <style>
+        .legend-container {
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .legend-square {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 
-<style>
-    .legend-container {
-        display: flex;
-        flex-direction: column;
 
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-
-    .legend-square {
-        width: 20px;
-        height: 20px;
-        margin-right: 5px;
-    }
-</style>
 
 <body>
 
     <div id="mapcontainer">
-        <div id="map"></div>
-        <div class="map-overlay top">
+        <div id="map" class="mapboxgl-map">
+            <div class="mapboxgl-canary" style="visibility: hidden;"></div>
+            <div
+                class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate">
+                <canvas class="mapboxgl-canvas" tabindex="0" aria-label="Map" role="region" width="2880" height="300"
+                    style="width: 1440px; height: 150px;"></canvas></div>
+            <div class="mapboxgl-control-container">
+                <div class="mapboxgl-ctrl-top-left"></div>
+                <div class="mapboxgl-ctrl-top-right"></div>
+                <div class="mapboxgl-ctrl-bottom-left">
+                    <div class="mapboxgl-ctrl" style="display: block;"><a class="mapboxgl-ctrl-logo" target="_blank"
+                            rel="noopener nofollow" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a></div>
+                </div>
+                <div class="mapboxgl-ctrl-bottom-right">
+                    <div class="mapboxgl-ctrl mapboxgl-ctrl-attrib"><button class="mapboxgl-ctrl-attrib-button"
+                            type="button" aria-label="Toggle attribution"><span class="mapboxgl-ctrl-icon"
+                                aria-hidden="true" title="Toggle attribution"></span></button>
+                        <div class="mapboxgl-ctrl-attrib-inner" role="list"><a href="https://www.mapbox.com/about/maps/"
+                                target="_blank" title="Mapbox" aria-label="Mapbox">© Mapbox</a> <a
+                                href="https://www.openstreetmap.org/about/" target="_blank" title="OpenStreetMap"
+                                aria-label="OpenStreetMap">© OpenStreetMap</a> <a class="mapbox-improve-map"
+                                href="https://apps.mapbox.com/feedback/?owner=dgplusdesign&amp;id=clndfduov03va01r7ayp5d9kl&amp;access_token=pk.eyJ1IjoiZGdwbHVzZGVzaWduIiwiYSI6ImNsMGhndHJvdjA4aWozZW1xb21tY3VuZGoifQ.R8LGSPakcmmq-FVmRp7_1A#/-101.81/33.31/3.39"
+                                target="_blank" aria-label="Map feedback" rel="noopener nofollow">Improve this map</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="map-overlay">
             <div class="map-overlay-inner">
-                <h3>Title ?</h3>
+                <h3>Legend</h3>
                 <!-- <h4>cents/kWh</h4> -->
                 <div id="legend" class="legend-container">
                     <div class="legend-item">
-                        <div class="legend-square" style="background-color: #0048A8"></div>
-                        <div class="legend-text">Yes</div>
-                    </div>
-                    <div class="legend-item">
                         <div class="legend-square" style="background-color: #065ED4"></div>
-                        <div class="legend-text">2024</div>
+                        <div class="legend-text">Full Coverage</div>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-square" style="background-color: #F8F8F8"></div>
-                        <div class="legend-text">No</div>
+                        <div class="legend-square" style="background-color: #1D8BE4"></div>
+                        <div class="legend-text">Coming Soon</div>
                     </div>
-
                 </div>
                 <div id="filters"></div>
-                <label>Borders: <input id="borders" type="checkbox" checked></label>
+                <label>Borders: <input id="borders" type="checkbox" checked=""></label>
             </div>
 
         </div>
@@ -79,16 +102,21 @@
         const fullscreen = document.getElementById('fullscreen');
         const mainData = {
             sprData: [],
-            filters: new Set()
+            filters: new Set(),
+            borderFilters: []
         }
 
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZGdwbHVzZGVzaWduIiwiYSI6ImNsMGhndHJvdjA4aWozZW1xb21tY3VuZGoifQ.R8LGSPakcmmq-FVmRp7_1A';
+        mapboxgl.accessToken =
+            'pk.eyJ1IjoiZGdwbHVzZGVzaWduIiwiYSI6ImNsMGhndHJvdjA4aWozZW1xb21tY3VuZGoifQ.R8LGSPakcmmq-FVmRp7_1A';
         const map = new mapboxgl.Map({
             container: 'map', // container ID
             // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
             style: 'mapbox://styles/dgplusdesign/clndfduov03va01r7ayp5d9kl', // style URL
-            center: { lng: -99.48299257741193, lat: 40.92230044374887 },
-            zoom: 4.5,// starting zoom,
+            center: {
+                lng: -99.48299257741193,
+                lat: 40.92230044374887
+            },
+            zoom: 4.5, // starting zoom,
             projection: "mercator"
         });
 
@@ -96,7 +124,9 @@
 
             Promise.all([
                 // d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTpREYfOKz_1Q7BpOQzZRzgJVD16dBRkiCnd-Ri_1NU73mZ47_gsE37H96sD3lVAx0O5Tpywl-7NYAO/pub?gid=410626648&single=true&output=csv"),
-                d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vT_zsl_ENEGp078oZ2dU2wBZTsIccGvHaK75GIM_yNQ_jS421uQe3s-0vOy6ekJnCQPx-yMlI3W3Zdh/pub?output=csv"),
+                d3.csv(
+                    "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_zsl_ENEGp078oZ2dU2wBZTsIccGvHaK75GIM_yNQ_jS421uQe3s-0vOy6ekJnCQPx-yMlI3W3Zdh/pub?output=csv"
+                    ),
             ]).then(data => {
                 console.log('data', data);
                 const [sprData] = data
@@ -107,16 +137,19 @@
                         let color = 'transparent';
                         switch (value) {
                             case 'yes':
-                                color = '#0048A8';
-                                break;
-                            case 'no':
-                                color = '#F8F8F8';
-                                break;
-                            case '2024':
+                                console.log('', d.Entity.toUpperCase(), d['Utility Coverage']);
                                 color = '#065ED4';
                                 break;
+                            case 'no':
+                                color = 'transparent';
+                                break;
+                            case '2024':
+                                color = '#1D8BE4';
+                                break;
                         }
-                        return [['==', ['get', "NAME"], d.Entity.toUpperCase()], color]
+                        return [
+                            ['==', ['get', "NAME"], d.Entity.toUpperCase()], color
+                        ]
                     })
                 console.log('filtersArray', filtersArray);
 
@@ -126,26 +159,32 @@
                     "transparent"
                 ])
 
-                map.setPaintProperty(layerName, "fill-opacity", 0.7)
-                map.setPaintProperty(layerName, "fill-outline-color", "white")
+                setBorders("white")
+
+                map.setPaintProperty(layerName, "fill-opacity", 1)
+                //map.setPaintProperty(layerName, "fill-outline-color", "white")
                 //map.setPaintProperty(layerName, "fill-outline-color", "transparent")
+
 
                 //set layers order 1st YES 
                 const YES = mainData.sprData
                     .filter(d => d['Utility Coverage'].toLowerCase().trim() === 'yes')
                     .map(d => d.Entity.toUpperCase())
-                    .map(d => [["==", ["get", "NAME"], d], 100000])
+                    .map(d => [
+                        ["==", ["get", "NAME"], d], 100000
+                    ])
 
                 map.setLayoutProperty(layerName, "fill-sort-key", [
                     "case",
                     ...YES.flat(),
-                    0  // Default sort key value for "no"
+                    0 // Default sort key value for "no"
                 ])
+
+                //add legend
 
             })
 
             //A, D, E, J, P, and Q
-
             const displayItemsNames = [
                 'Entity',
                 'Ownership',
@@ -166,9 +205,23 @@
                 const uniqueNames = [...new Set(names)]
                 console.log('uniqueNames', uniqueNames);
 
+                const sprNames = mainData.sprData.map(d => d.Entity.toUpperCase())
+                const includes = sprNames.filter(name => uniqueNames.includes(name))
+                console.log('includes', includes);
+
+
+
+                if (includes.length === 0) return;
 
                 const descr = uniqueNames
                     .filter(name => name)
+                    .filter(name => {
+                        const res = mainData.sprData
+                            .filter(spr => spr.Entity && spr.Entity !== "")
+                            .find(spr => clear(spr.Entity) === clear(name))
+                        console.log('res', res);
+                        return res && res['Utility Coverage'].toLowerCase() !== 'no'
+                    })
                     .map(name => {
 
                         const res = mainData.sprData
@@ -184,17 +237,13 @@
                             <div>Interval Data: ${res['Interval Data']}</div>
                             <div>Meter Interval: ${res['Meter Interval']}</div>
                         </div>
-                            `
-                            : ``
-                        //     `
-                        // <div class="popup-main">
-                        //     <div><b>${name}</b></div>
-                        //     <div>NO DATA</div>
-                        // </div>
-                        // `
-
+                            ` :
+                            ``
                         return text
-                    }).join("")
+                    })
+
+                console.log('descr', descr);
+                if (descr.length === 0) return;
 
                 // Copy coordinates array.
                 new mapboxgl.Popup()
@@ -215,12 +264,41 @@
 
             bordersCheckbox.addEventListener('input', (e) => {
                 const val = bordersCheckbox.checked ? "white" : "transparent"
-                map.setPaintProperty(layerName, "fill-outline-color", val)
+                //map.setPaintProperty(layerName, "fill-outline-color", val)
+                setBorders(val)
             })
+
+            function setBorders(val) {
+                const borderFilters = mainData.sprData
+                    .map(d => {
+                        const value = d['Utility Coverage'].toLowerCase().trim();
+                        let color = 'transparent';
+                        switch (value) {
+                            case 'yes':
+                                color = val;
+                                break;
+                            case 'no':
+                                color = 'transparent';
+                                break;
+                            case '2024':
+                                color = val;
+                                break;
+                        }
+                        return [
+                            ['==', ['get', "NAME"], d.Entity.toUpperCase()], color
+                        ]
+                    })
+                map.setPaintProperty(layerName, "fill-outline-color", [
+                    'case',
+                    ...borderFilters.flat(),
+                    "transparent"
+                ])
+            }
 
         });
 
         fullscreen.addEventListener('click', toggleFullscreen)
+
         function toggleFullscreen() {
             let elem = document.getElementById("mapcontainer");
             if (!document.fullscreenElement) {
@@ -237,8 +315,9 @@
             if (!str) return "";
             return str.replaceAll(/[\,\.]/g, " ").replace(/[\s]{2,}/, " ").trim().toLowerCase()
         }
-
     </script>
+
+
 
 </body>
 
