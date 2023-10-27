@@ -137,7 +137,7 @@
                 // d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQmnSsagiUa4BUj54EnHA9PG_kkRfM0U7vCTpHzilswYIONTr6P2AspBCyPc95O7Oj8HDd7Dbm7ZD1G/pub?gid=1984681308&single=true&output=csv"),
                 d3.csv(
                     "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_zsl_ENEGp078oZ2dU2wBZTsIccGvHaK75GIM_yNQ_jS421uQe3s-0vOy6ekJnCQPx-yMlI3W3Zdh/pub?gid=1881633725&single=true&output=csv"
-                    ),
+                ),
                 fetch("base/s_22mr22.json").then(data => data.json())
             ]).then(data => {
 
@@ -160,7 +160,7 @@
                 ])
                 map.setPaintProperty(layerName, "fill-opacity", 1)
 
-
+                legendDiv.innerHTML = '';
                 const legend = new Map();
 
                 mainData.sprData.forEach(d => {
