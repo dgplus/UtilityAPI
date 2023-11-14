@@ -80,9 +80,9 @@
                         </div>
                     </div>
                 </div>
-                <label>Borders:
+                <!-- <label>Borders:
                     <input id="borders" type="checkbox" checked="">
-                </label>
+                </label> -->
             </div>
         </div>
         <div id="fullscreen">Full screen</div>
@@ -90,7 +90,7 @@
 
     <script>
         const legendDiv = document.getElementById('legend');
-        const bordersCheckbox = document.getElementById('borders');
+        // const bordersCheckbox = document.getElementById('borders');
         const slider = document.getElementById('slider');
         const sliderValue = document.getElementById('slider-value');
         const layerName = 'states-layer'
@@ -219,10 +219,10 @@
                 map.getCanvas().style.cursor = '';
             });
 
-            bordersCheckbox.addEventListener('input', (e) => {
-                const val = bordersCheckbox.checked ? "white" : "transparent"
-                map.setPaintProperty(layerName, "fill-outline-color", val)
-            })
+            // bordersCheckbox.addEventListener('input', (e) => {
+            //     const val = bordersCheckbox.checked ? "white" : "transparent"
+            //     map.setPaintProperty(layerName, "fill-outline-color", val)
+            // })
 
             // slider.addEventListener('input', (e) => {
             //     map.setPaintProperty(
