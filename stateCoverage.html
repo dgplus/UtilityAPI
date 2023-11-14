@@ -163,32 +163,32 @@
                 legendDiv.innerHTML = '';
                 const legend = new Map();
 
-                // mainData.sprData.forEach(d => {
-                //     legend.set(d['Ranking Tier 1'], d['Color'])
-                // })
-                // console.log('legend', legend);
+                mainData.sprData.forEach(d => {
+                    legend.set(d['Ranking Tier 1'], d['Color'])
+                })
+                console.log('legend', legend);
 
-                // legend.forEach((value, key) => {
+                legend.forEach((value, key) => {
 
-                //     const div = document.createElement("div")
-                //     div.className = "square-container"
+                    const div = document.createElement("div")
+                    div.className = "square-container"
 
-                //     const text = document.createElement("div")
-                //     text.className = "square-text"
-                //     text.innerText = key
+                    const text = document.createElement("div")
+                    text.className = "square-text"
+                    text.innerText = key
 
-                //     const sq = document.createElement("div")
-                //     sq.className = "square"
-                //     sq.style.backgroundColor = value
-                //     sq.style.opacity = 1
-                //     sq.style.border = "1px solid #ccc"
+                    const sq = document.createElement("div")
+                    sq.className = "square"
+                    sq.style.backgroundColor = value
+                    sq.style.opacity = 1
+                    sq.style.border = "1px solid #ccc"
 
-                //     div.appendChild(sq)
-                //     div.appendChild(text)
+                    div.appendChild(sq)
+                    div.appendChild(text)
 
-                //     legendDiv.appendChild(div)
+                    legendDiv.appendChild(div)
 
-                // })
+                })
             })
 
             map.on("click", layerName, e => {
